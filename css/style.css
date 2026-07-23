@@ -997,6 +997,43 @@ section { padding: 110px 0; }
   .whatsapp-float svg { width: 26px; height: 26px; }
 }
 
+/* CTA WhatsApp entre seções (somente mobile) */
+.mobile-whatsapp-cta { display: none; }
+@media (max-width: 860px) {
+  .mobile-whatsapp-cta {
+    display: block;
+    background: var(--panel-2);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 30px 0;
+  }
+  .mobile-whatsapp-cta .wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+  .mobile-whatsapp-cta-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #25D366;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .mobile-whatsapp-cta-icon svg { width: 24px; height: 24px; }
+  .mobile-whatsapp-cta p {
+    font-size: 15px;
+    color: var(--ink);
+    max-width: 320px;
+    margin: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition: none !important; }
