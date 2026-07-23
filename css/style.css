@@ -59,7 +59,7 @@ a { color: inherit; text-decoration: none; }
 
 h1, h2, h3 { font-family: var(--font-display); font-weight: 500; margin: 0; }
 
-em { font-style: italic; color: var(--brass-bright); }
+em { font-style: normal; color: var(--brass-bright); }
 
 /* Header */
 .site-header {
