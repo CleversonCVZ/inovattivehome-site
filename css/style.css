@@ -972,7 +972,7 @@ section { padding: 110px 0; }
 }
 .whatsapp-float {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   right: 24px;
   width: 58px;
   height: 58px;
@@ -993,7 +993,7 @@ section { padding: 110px 0; }
 }
 
 @media (max-width: 640px) {
-  .whatsapp-float { width: 52px; height: 52px; bottom: 18px; right: 18px; }
+  .whatsapp-float { width: 52px; height: 52px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); right: 18px; }
   .whatsapp-float svg { width: 26px; height: 26px; }
 }
 
