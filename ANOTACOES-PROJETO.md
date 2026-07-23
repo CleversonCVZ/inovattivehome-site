@@ -1,46 +1,74 @@
 # Anotações do projeto — Site Inovattive Home
 
-Última atualização: 22/07/2026
+Última atualização: 23/07/2026
 
 ## Estrutura do projeto
 
-A pasta raiz (`inovattivehome-novo/`) É o site pronto — antes havia uma pasta duplicada
-aninhada, foi corrigido. Estrutura atual:
+A pasta raiz (`inovattivehome-novo/`) é o site pronto. Estrutura atual:
 
 - `index.html` — home
 - `css/style.css`, `js/script.js`
-- `img/` — logo, hero, fotos de experiência e portfólio, logos de marcas
+- `img/` — logo, hero, fotos de experiência e portfólio, logos de marcas, favicons, `img/team/` (fotos do fundador)
 - `sobre/`, `rti/`, `unifi/`, `aat/`, `controlart/`, `fibaro/`, `sonos/`, `lutron/`, `denon/`, `yamaha/` — páginas de marca
-- `materiais-brutos/` — arquivos de apoio (fotos originais, zips, imagens que o Cleverson vai mandando pra eu aplicar no site). Sempre que ele disser "coloquei na pasta materiais brutos", procurar ali.
+- `materiais-brutos/` — arquivos de apoio (fotos originais, zips, imagens que o Cleverson vai mandando pra eu aplicar no site). Sempre que ele disser "coloquei na pasta materiais brutos", procurar ali. Tem subpastas por marca/pessoa (ex: `Controlart/`, `Cleverson/`).
 - `Resumos_Marcas_InovattiveHome.docx` — resumos de cada marca (já todo incorporado nas páginas)
+- `.htaccess` — redirects 301 (herdados do site WordPress antigo)
 - `ANOTACOES-PROJETO.md` — este arquivo
+
+## GitHub e Netlify (deploy automático)
+
+- Repositório: `CleversonCVZ/inovattivehome-site` (branch `main`).
+- **Fluxo de git**: a pasta do projeto está em Documents sincronizado com iCloud, montada via
+  FUSE no sandbox Linux — operações git diretas ali são instáveis (erros de deadlock). Por isso
+  todo commit/push é feito num clone separado em `/tmp/repo-sync` (fora do iCloud): eu copio os
+  arquivos alterados pra lá, faço `git add/commit/push`. Não uso a MCP do Netlify pra deploy
+  (bloqueada pelo proxy do sandbox) — o deploy é automático via GitHub.
+- Netlify: site `inovattivehome` (renomeado do nome aleatório original), linkado ao GitHub —
+  **todo `git push` na branch `main` dispara deploy automático**. Não preciso fazer nada manual
+  no Netlify depois de um push.
+- Site publicado em: inovattivehome.netlify.app (domínio próprio ainda não configurado).
 
 ## Padrão visual
 
-Site dark/premium: fundo quase preto (#0B0C0E), acentos dourado/latão (#B08D57),
-fontes Fraunces (títulos) + Manrope (corpo) + IBM Plex Mono (labels).
+Site dark/premium: fundo quase preto (#0B0C0E), acentos dourado/latão (#B08D57 / #D4A64A).
+**Fontes: Montserrat (títulos) + Open Sans (corpo) + IBM Plex Mono (labels/eyebrows)** — trocado
+de Fraunces+Manrope nesta sessão, aprovado como definitivo pelo Cleverson. Tudo controlado por
+CSS custom properties (`--font-display`, `--font-body`) em `style.css`, então trocar fonte de
+novo no futuro é mexer só ali.
+
+Texto em dourado usando `<em>` **não é mais itálico** — só cor (`em { font-style: normal; }`),
+por pedido do Cleverson, aplicado globalmente.
 
 ### Card "em destaque" (produto com imagem)
-Criamos a classe `.service-card-featured` (CSS em `style.css`) pra qualquer card do
-grid de "Principais Produtos"/"Destaques" ganhar imagem + texto lado a lado, span de
-linha inteira. Duas variantes:
-- **Produto em fundo branco/estúdio**: usa `.service-card-img-wrap` puro (moldura com
-  gradiente branco, linha dourada no topo) — pra fotos de produto tipo catálogo.
-- **Foto real de ambiente/instalação**: usa `.service-card-img-wrap.photo` (sem o
-  fundo branco, imagem preenche o quadro com object-fit:cover) — pra fotos de
-  instalação real ou screenshots de software.
+Classe `.service-card-featured` — imagem + texto lado a lado, span de linha inteira. Variantes
+de `.service-card-img-wrap`:
+- **(sem modificador)** — fundo branco/estúdio, pra fotos de produto tipo catálogo.
+- **`.photo`** — fundo escuro, `object-fit:cover` (preenche/corta), pra fotos reais de
+  ambiente/instalação.
+- **`.photo.contain`** — fundo escuro, `object-fit:contain` (mostra a imagem inteira sem
+  cortar), usado quando o crop do `.photo` ficava ruim.
+- **`.product-carousel`** — variante com várias imagens e setas de navegação (prev/next),
+  ocupando o mesmo espaço visual de um card normal. JS genérico em `script.js` lê o atributo
+  `data-images` (JSON) do elemento com essa classe e troca o `src` da `<img>` dentro dele ao
+  clicar nas setas — **reutilizável em qualquer lugar do site**, não só em cards de produto (foi
+  reaproveitado no avatar do fundador na página Sobre, ver abaixo).
 
 Esse padrão é reutilizável em qualquer página de marca daqui pra frente.
 
 ## Status por página de marca
 
-**RTI** (`rti/index.html`) — grid de 6 cards, 4 já com imagem:
-- ✅ Controles Remotos Premiados (foto do controle, fundo branco)
-- ✅ Processadores de Controle (foto XP-6s, fundo branco)
-- ✅ Painéis Touch (foto IST-10, fundo branco)
-- ✅ Integration Designer (screenshot System Manager, variante foto)
-- ⬜ Distribuição Multi-Room AV — só texto ainda
-- ⬜ Hospitality & Corporativo — só texto ainda
+**RTI** (`rti/index.html`) — grid completo, todos com imagem real:
+- ✅ Controles Remotos Premiados, Processadores de Controle, Painéis Touch, Integration Designer
+- ✅ Hospitality & Corporativo (imagem do touchpanel + texto traduzido do inglês)
+- Card "Distribuição Multi-Room AV" foi **removido** (pedido do Cleverson)
+
+**ControlArt** (`controlart/index.html`) — grid com 5 produtos reais (era 6 placeholders):
+- ✅ Módulo Cabeado Relé (imagem `Ecossistema-Cabeado-v2.png`, variante `.photo.contain`)
+- ✅ Módulo Cabeado Dimmer (imagem `mODULO diMMER.png`, PNG transparente, `.photo.contain`)
+- ✅ IR Blaster 360 (imagem `Banner-gateway_`)
+- ✅ Keypads IVOLV (imagem `Ecossistema-IVOLV`)
+- ✅ Quadros de Automação — **carrossel** com 3 fotos reais de instalação (setas prev/next)
+- Card "Design Elegante" foi **removido** (pedido do Cleverson)
 
 **UniFi** (`unifi/index.html`) — grid de 6 cards, 3 já com imagem:
 - ⬜ Wi-Fi de Alta Capacidade — só texto
@@ -50,8 +78,17 @@ Esse padrão é reutilizável em qualquer página de marca daqui pra frente.
 - ✅ Escalável (foto rack instalado em armário, variante foto)
 - ⬜ Suporte Técnico — só texto
 
-**Outras marcas** (AAT, ControlArt, Fibaro, Sonos, Lutron, Denon, Yamaha) — ainda só
-com texto, nenhuma imagem de produto aplicada ainda.
+**Outras marcas** (AAT, Fibaro, Sonos, Lutron, Denon, Yamaha) — ainda só com texto, nenhuma
+imagem de produto aplicada ainda.
+
+## Página Sobre (`sobre/index.html`)
+- Avatar do fundador: era um círculo com as iniciais "CZ", virou um **carrossel de fotos reais**
+  (2 fotos, pasta `materiais-brutos/Cleverson/`), reaproveitando o mesmo componente
+  `.product-carousel`/JS dos cards de produto. Círculo aumentado de 72px pra 140px pra dar pra
+  reconhecer o rosto. Fotos processadas/cropadas e salvas em `img/team/cleverson-1.jpg` e
+  `cleverson-2.jpg`.
+- Texto de história corrigido pra primeira pessoa ("Percebi", "meus clientes" — antes estava em
+  terceira pessoa "Percebeu"/"seus clientes" por engano).
 
 ## Depoimentos (home, seção "Depoimentos")
 Os 3 cards já têm depoimentos reais (não são mais placeholder):
@@ -61,6 +98,20 @@ Os 3 cards já têm depoimentos reais (não são mais placeholder):
 
 Todos os 3 têm o selo "Avaliação no Google" (logo colorida) + 5 estrelas douradas no topo.
 
+## Contato e conversão (WhatsApp / redes sociais)
+- Seção de contato (home, `#contato`): lista WhatsApp / Telefone / Localização e, logo abaixo,
+  **Instagram / Facebook / YouTube** (ícone + link), no mesmo padrão visual dos itens acima.
+  Links reais: instagram.com/inovattivehome, facebook.com/inovativehome, youtube.com/channel/UCbEOoF0XL7lhBxxzGGqCXdQ.
+  (Não estão mais no rodapé — foram movidos pra cá a pedido do Cleverson; o rodapé das outras 10
+  páginas de marca ainda mantém os ícones sociais, já que elas não têm essa seção de contato.)
+- Texto do item WhatsApp: "Resposta rápida e atendimento humanizado".
+- **CTAs de WhatsApp entre seções, só no mobile** (`.mobile-whatsapp-cta`, `@media max-width:860px`):
+  3 banners com texto "Fale agora com um especialista." + botão "Chamar no WhatsApp", posicionados
+  depois de Serviços, depois de Portfólio e depois de Depoimentos. Sem ícone (removido a pedido).
+- Botão flutuante do WhatsApp (`.whatsapp-float`): ajustado pra respeitar
+  `env(safe-area-inset-bottom)` — evita ficar colado/escondido atrás da barra do navegador no
+  mobile ao rolar a página.
+
 ## Outras edições feitas na home
 - Hero stats: "+230 Projetos entregues" / "10 Anos de atuação" (removido o card de "100%")
 - Eyebrow do hero: só "Curitiba" (removido "& Balneário Camboriú" — mas continua em
@@ -68,32 +119,48 @@ Todos os 3 têm o selo "Avaliação no Google" (logo colorida) + 5 estrelas dour
 - Texto do hero: "...projetado, instalado e configurado por uma equipe especializada..."
 - Título da seção Serviços: "O rigor de uma engenharia que se sente em cada ambiente."
 - Card Iluminação: "...horário, luminosidade e função do ambiente..."
+- Frase trocada: "Trabalhamos apenas com o que há de melhor no mundo" → "Trabalhamos com
+  excelentes marcas nacionais e importadas"
+
+## SEO / técnico
+- Auditoria feita comparando com o site antigo (inovattivehome.com.br, WordPress, será
+  desativado). Aplicado: favicons completos (favicon.ico + PNGs + apple-touch-icon, gerados a
+  partir do ícone "IH" da logo) em todas as 11 páginas; 2 redirects 301 que faltavam no
+  `.htaccess` (`/home-b/` e `/sample-page/` → home).
+- **Pendente**: Google Analytics (GA4), Google Tag Manager e/ou Google Ads — preciso dos IDs do
+  Cleverson pra instalar. Ele ainda não passou. Perguntar de novo quando for relevante.
 
 ## Pendências técnicas
 - **Imagem grande não otimizada**: `img/brands/ubiquiti-produtos/rack-gerenciamento.png`
-  (1,7 MB) ainda não foi comprimida — travou com erro de sincronização iCloud
-  ("Resource deadlock avoided") toda vez que tento ler o arquivo pelo terminal.
-  Pedi pro Cleverson abrir a pasta no Finder e clicar na imagem pra forçar o
-  download do iCloud. Se ele confirmar que já abriu, tentar comprimir de novo
-  (mesmo processo usado no `aat.png`, que já foi de 1,9 MB pra 124 KB).
-- Página "Sobre" ainda não foi revisada/atualizada nesta sessão.
+  (1,7 MB) ainda não foi comprimida.
+- Marcas sem imagem de produto real ainda: AAT, Fibaro, Sonos, Lutron, Denon, Yamaha (só texto).
+- UniFi: 3 dos 6 cards ainda só com texto (Wi-Fi de Alta Capacidade, Segurança de Rede,
+  Suporte Técnico).
+- Há fotos de referência do ControlArt em `materiais-brutos/Controlart/` ainda não usadas no
+  site (variações de cor do keypad IVOLV, módulo CANBUS, IR Blaster amplificado, algumas fotos
+  de instalação real) — sem instrução ainda de onde/se usar.
+- GitHub PAT que o Cleverson colou em texto puro no chat em algum momento desta sessão —
+  recomendado (mas não confirmado) que ele revogue/gere um novo por segurança.
 
 ## Bugs corrigidos
-- **Menu sumia no mobile**: o CSS só tinha `display:none` pro `.main-nav` em telas
-  estreitas, sem nenhum botão pra abrir. Adicionado botão hambúrguer (`.nav-toggle`)
-  em todas as 11 páginas + CSS/JS de abrir-fechar em `style.css`/`script.js`.
-- **index.html da raiz não abria o site**: era uma versão antiga com paths quebrados.
-  Corrigido reorganizando a estrutura de pastas (sem mais duplicação).
-- **Botão do WhatsApp/menu "grudava" no fim da página ao rolar**: a animação de
-  fade entre páginas usava `transform` no `<body>`, o que quebra `position:fixed`
-  dos elementos filhos. Corrigido removendo o `transform`, mantendo só `opacity`
-  na transição.
+- **Menu sumia no mobile**: adicionado botão hambúrguer (`.nav-toggle`) em todas as 11 páginas +
+  CSS/JS de abrir-fechar.
+- **index.html da raiz não abria o site**: corrigido reorganizando a estrutura de pastas (sem
+  mais duplicação).
+- **Botão do WhatsApp/menu "grudava" no fim da página ao rolar**: corrigido removendo `transform`
+  da transição de fade entre páginas, mantendo só `opacity`.
+- **Botão do WhatsApp ficava colado na barra do navegador no mobile**: corrigido com
+  `env(safe-area-inset-bottom)`.
 
 ## Preferências do Cleverson (importante lembrar)
 - Prefere respostas curtas e diretas, sem enrolação.
-- Costuma mandar imagens/textos aos poucos, um card por vez — sempre aplicar o
-  padrão `.service-card-featured` quando ele mandar imagem de produto pra
-  alguma marca.
-- Pede pra eu avisar quando uma imagem sugerida tiver problema (marca de
-  terceiros visível, marca d'água, equipamento errado) em vez de simplesmente
-  usar — já aconteceu na página UniFi (3 das 6 fotos foram descartadas por isso).
+- Costuma mandar imagens/textos aos poucos, um card por vez — sempre aplicar o padrão
+  `.service-card-featured` quando ele mandar imagem de produto pra alguma marca.
+- Pede pra eu avisar quando uma imagem sugerida tiver problema (marca de terceiros visível,
+  marca d'água, equipamento errado, foto cortada estranho) em vez de simplesmente usar — já
+  aconteceu várias vezes (UniFi, ControlArt) e a resposta certa é recortar/trocar e mostrar de
+  novo, iterando até ele aprovar.
+- Depois de qualquer mudança visual, ele confere direto no site publicado (netlify.app) pelo
+  celular — então sempre fazer commit+push logo depois de editar, sem esperar ele pedir.
+- Decisões de escopo/frequência de UI (ex: quantos CTAs, onde colocar algo) — vale perguntar
+  com opções antes de implementar, em vez de assumir a versão mais agressiva.
