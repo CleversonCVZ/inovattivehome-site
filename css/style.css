@@ -938,18 +938,57 @@ section { padding: 110px 0; }
   top: 110px;
 }
 .founder-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 18px;
   font-family: var(--font-display);
   font-size: 26px;
   color: var(--brass);
-  margin-bottom: 18px;
+}
+.founder-photo-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.founder-photo-mask {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+}
+.founder-photo-mask img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.founder-photo-carousel .carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(11,12,14,0.75);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.founder-photo-carousel .carousel-arrow-prev { left: -10px; }
+.founder-photo-carousel .carousel-arrow-next { right: -10px; }
+.founder-photo-carousel .carousel-arrow:hover {
+  background: var(--brass);
+  color: #12100c;
 }
 .founder-name { font-family: var(--font-display); font-size: 19px; margin-bottom: 4px; }
 .founder-role { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.05em; }
