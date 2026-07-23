@@ -111,6 +111,30 @@ document.querySelectorAll('.scene-btn').forEach(function (btn) {
   }
 })();
 
+// Mini carrossel de fotos dentro de cards de produto (setas esquerda/direita)
+document.querySelectorAll('.product-carousel').forEach(function (wrap) {
+  var images = [];
+  try {
+    images = JSON.parse(wrap.getAttribute('data-images') || '[]');
+  } catch (e) {
+    images = [];
+  }
+  if (images.length < 2) return;
+
+  var img = wrap.querySelector('.service-card-img');
+  var prevBtn = wrap.querySelector('.carousel-arrow-prev');
+  var nextBtn = wrap.querySelector('.carousel-arrow-next');
+  var idx = 0;
+
+  function show(i) {
+    idx = (i + images.length) % images.length;
+    img.src = images[idx];
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function () { show(idx - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { show(idx + 1); });
+});
+
 // Carrossel de projetos: navegação por setas
 (function () {
   var track = document.getElementById('carousel-track');
