@@ -807,6 +807,7 @@ section { padding: 110px 0; }
 
 /* Responsive */
 @media (max-width: 860px) {
+  .hero-actions .btn-primary { display: none; }
   .nav-toggle { display: flex; }
   .main-nav {
     position: fixed;
