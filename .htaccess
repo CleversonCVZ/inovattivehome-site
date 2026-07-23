@@ -43,6 +43,10 @@ Redirect 301 /origins-acoustics/ /index.html#marcas
 # Loja desativada -> Home
 RedirectMatch 301 ^/produto/(.*)$ /index.html
 
+# Páginas antigas do WordPress sem equivalente -> Home
+Redirect 301 /home-b/ /index.html
+Redirect 301 /sample-page/ /index.html
+
 # Qualquer outra URL antiga do WordPress não mapeada acima
 # pode ser adicionada aqui conforme for aparecendo no
 # Google Search Console (seção "Páginas não indexadas" / 404s).
