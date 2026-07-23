@@ -1,19 +1,86 @@
-// Formulário de contato: monta a mensagem e abre o WhatsApp
+// Questionário dinâmico de contato: uma pergunta por vez, monta a mensagem e abre o WhatsApp
 (function () {
   var form = document.getElementById('contact-form');
   if (!form) return;
   var WHATSAPP_NUMBER = '5541991510243';
 
+  var steps = Array.prototype.slice.call(form.querySelectorAll('.quiz-step'));
+  if (!steps.length) return; // formulário antigo (sem quiz) — não faz nada
+  var progressBar = document.getElementById('quiz-progress-bar');
+  var answers = {};
+  var current = 0;
+
+  function goTo(index) {
+    if (index < 0 || index >= steps.length) return;
+    steps[current].classList.remove('active');
+    current = index;
+    steps[current].classList.add('active');
+    progressBar.style.width = ((current + 1) / steps.length * 100) + '%';
+  }
+
+  // Perguntas de múltipla escolha: seleciona, guarda a resposta e avança sozinho
+  form.querySelectorAll('.quiz-option').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var field = btn.getAttribute('data-field');
+      var value = btn.getAttribute('data-value');
+      answers[field] = value;
+
+      var siblings = btn.parentNode.querySelectorAll('.quiz-option');
+      siblings.forEach(function (s) { s.classList.remove('selected'); });
+      btn.classList.add('selected');
+
+      // Ajusta o texto da pergunta seguinte conforme o tipo de projeto escolhido
+      if (field === 'tipo') {
+        var label = document.getElementById('quiz-mensagem-label');
+        if (label) {
+          label.textContent = value === 'Escritório / Corporativo'
+            ? 'Conte um pouco sobre o que você imagina pro seu escritório'
+            : 'Conte um pouco sobre o que você imagina pro seu projeto';
+        }
+      }
+
+      setTimeout(function () { goTo(current + 1); }, 250);
+    });
+  });
+
+  // Botões "Voltar"
+  form.querySelectorAll('.quiz-back').forEach(function (btn) {
+    btn.addEventListener('click', function () { goTo(current - 1); });
+  });
+
+  // Botões "Continuar" (passos com campo de texto): valida antes de avançar
+  form.querySelectorAll('.quiz-next').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var step = steps[current];
+      var required = step.querySelector('[required]');
+      if (required && !required.value.trim()) {
+        required.focus();
+        required.reportValidity();
+        return;
+      }
+      goTo(current + 1);
+    });
+  });
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var nome = form.nome.value.trim();
-    var telefone = form.telefone.value.trim();
-    var tipo = form.tipo.value;
-    var mensagem = form.mensagem.value.trim();
+    var telefoneInput = document.getElementById('quiz-telefone');
+    if (!telefoneInput.value.trim()) {
+      telefoneInput.focus();
+      telefoneInput.reportValidity();
+      return;
+    }
+
+    var nome = document.getElementById('quiz-nome').value.trim();
+    var telefone = telefoneInput.value.trim();
+    var mensagem = document.getElementById('quiz-mensagem').value.trim();
+    var tipo = answers.tipo || '';
+    var existente = answers.existente || '';
 
     var texto = 'Olá! Meu nome é ' + nome + '.' +
       '\nTelefone: ' + telefone +
       '\nTipo de projeto: ' + tipo +
+      (existente ? '\nJá tem automação instalada: ' + existente : '') +
       (mensagem ? '\nDetalhes: ' + mensagem : '');
 
     var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(texto);
