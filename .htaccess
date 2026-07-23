@@ -1,0 +1,48 @@
+# =========================================================
+# Redirecionamentos 301 — migração WordPress -> site estático
+# Inovattive Home
+# =========================================================
+# Objetivo: preservar o SEO já conquistado, redirecionando cada
+# URL antiga indexada no Google para o lugar mais equivalente
+# no site novo. Atualizar este arquivo conforme novas páginas
+# forem criadas (ex: quando /rti/ virar uma página própria em
+# vez de uma âncora, trocar o destino abaixo).
+
+RewriteEngine On
+
+# Home
+# (sem alteração de URL, mas mantido aqui por clareza)
+
+# Projetos / Portfólio
+Redirect 301 /a-2/ /index.html#portfolio
+
+# Página de serviço ainda sem página própria -> âncora de Serviços
+Redirect 301 /home-cinema/ /index.html#servicos
+Redirect 301 /cabeamento-estruturado/ /index.html#servicos
+Redirect 301 /servicos/ /index.html#servicos
+Redirect 301 /automacao-residencial/ /index.html#servicos
+
+# Marcas (página índice) -> âncora de Marcas
+Redirect 301 /marcas/ /index.html#marcas
+
+# Sobre e Contato (ainda sem página própria)
+Redirect 301 /contatos/ /index.html#contato
+
+# NOTA: /sobre/ NÃO precisa mais de redirecionamento — agora existe como
+# página real no site novo (sobre/index.html).
+
+# NOTA: /rti/, /lutron/, /fibaro/, /controlart/, /aat/ e /unifi/ NÃO precisam
+# mais de redirecionamento — agora existem como páginas reais no site novo,
+# na mesma URL de antes (rti/index.html, lutron/index.html, etc).
+
+# Marcas que a Inovattive não trabalha mais -> âncora de Marcas
+Redirect 301 /marantz/ /index.html#marcas
+Redirect 301 /revel/ /index.html#marcas
+Redirect 301 /origins-acoustics/ /index.html#marcas
+
+# Loja desativada -> Home
+RedirectMatch 301 ^/produto/(.*)$ /index.html
+
+# Qualquer outra URL antiga do WordPress não mapeada acima
+# pode ser adicionada aqui conforme for aparecendo no
+# Google Search Console (seção "Páginas não indexadas" / 404s).
