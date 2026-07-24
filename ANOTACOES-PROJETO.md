@@ -234,6 +234,22 @@ sobrescrever o arquivo específico que mudou (ex: se só mudei `css/style.css`, 
 desse arquivo dentro da pasta `css/` do `public_html`, substituindo o antigo). Se mudar vários
 arquivos de uma vez, aí sim vale considerar zipar de novo.
 
+**Já rodamos esse fluxo de "zip de novo" uma vez** (pra adicionar mensagem padrão nos links de
+WhatsApp em todas as 12 páginas — ver seção "Mensagem padrão nos links de WhatsApp" abaixo).
+Funcionou, mas com 2 detalhes pra lembrar sempre que repetir:
+- O zip baixado do GitHub inclui `ANOTACOES-PROJETO.md` e `.gitignore` (porque estão no
+  repositório) — **sempre apagar os dois da `public_html` depois de mover os arquivos**, senão
+  ficam publicamente acessíveis em `inovattivehome.com.br/ANOTACOES-PROJETO.md`. Já aconteceu do
+  Cleverson esquecer isso numa rodada.
+- Arquivos ocultos (`.htaccess`, `.gitignore`) continuam exigindo "mostrar arquivos ocultos"
+  ativado no Gerenciador de Arquivos pra aparecerem na pasta extraída antes de mover.
+
+## Mensagem padrão nos links de WhatsApp
+Todo link direto pro WhatsApp (botão flutuante `.whatsapp-float` nas 12 páginas + os 3 CTAs mobile
+"Chamar no WhatsApp" na home) agora abre com a mensagem pré-preenchida **"Olá! Vim do site e
+queria mais informações."** via parâmetro `?text=` na URL do `wa.me`. O questionário dinâmico de
+contato (`js/script.js`) continua com sua própria mensagem detalhada, não foi mexido.
+
 ## Bugs corrigidos
 - **Menu sumia no mobile**: adicionado botão hambúrguer (`.nav-toggle`) em todas as 11 páginas +
   CSS/JS de abrir-fechar.
