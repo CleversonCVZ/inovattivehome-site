@@ -181,8 +181,13 @@ pra exercer esses direitos. CSS novo: `.legal-content` em `style.css`.
   partir do ícone "IH" da logo) em todas as páginas; 2 redirects 301 que faltavam no
   `.htaccess` (`/home-b/` e `/sample-page/` → home); robots.txt e sitemap.xml já existiam e estão
   ok (sitemap não inclui `/privacidade/` de propósito, por causa do noindex).
-- **Pendente**: Google Analytics (GA4), Google Tag Manager e/ou Google Ads — preciso dos IDs do
-  Cleverson pra instalar. Ele ainda não passou. Perguntar de novo quando for relevante.
+- ~~Google Tag Manager~~ — **instalado em 24/07/2026**: container `GTM-NXWMRC7` (passado pelo
+  Felipe Gabriel via WhatsApp). Script no `<head>` (logo após a abertura) + `<noscript><iframe>`
+  logo após a abertura do `<body>`, nas 12 páginas. **Ainda não republicado na HostGator** depois
+  dessa mudança — lembrar de repetir o fluxo de zip (ver seção acima) quando o Cleverson topar.
+  GA4 (measurement ID) e Google Ads (conversion ID) continuam pendentes — se ele configurar isso
+  DENTRO do próprio GTM (o normal, é pra isso que o GTM serve), pode nem precisar mexer no código
+  do site de novo, só configurar as tags lá no painel do Tag Manager.
 
 ## Pendências técnicas
 - Marcas sem imagem de produto real ainda: AAT, Fibaro, Sonos, Lutron, Denon, Yamaha (só texto).
