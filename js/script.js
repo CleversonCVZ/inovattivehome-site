@@ -51,6 +51,7 @@
       // Sim -> fase da obra -> tipo de projeto -> mensagem (pula "já tem automação")
       // Não -> já tem automação -> mensagem (pula fase da obra e tipo de projeto)
       if (field === 'obra') {
+        var mensagemLabel = document.getElementById('quiz-mensagem-label');
         if (value === 'Sim') {
           path = ['obra', 'fase', 'tipo', 'mensagem', 'nome', 'telefone'];
           answers.existente = '';
@@ -58,6 +59,8 @@
           path = ['obra', 'existente', 'mensagem', 'nome', 'telefone'];
           answers.fase = '';
           answers.tipo = '';
+          // "Tipo de projeto" não é perguntado neste caminho — texto volta ao padrão
+          if (mensagemLabel) mensagemLabel.textContent = 'Conte um pouco sobre o que você imagina pro seu projeto';
         }
       }
 
