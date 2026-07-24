@@ -13,9 +13,9 @@
   var progressBar = document.getElementById('quiz-progress-bar');
   var stepCountEl = document.getElementById('quiz-step-count');
   var answers = {};
-  // Caminho padrão (quem responde "Não" pra 1ª pergunta segue direto por aqui).
-  // Se responder "Sim", o passo "fase" é inserido logo depois de "obra".
-  var path = ['obra', 'tipo', 'existente', 'mensagem', 'nome', 'telefone'];
+  // Caminho padrão (quem responde "Não" pra 1ª pergunta segue direto por aqui,
+  // sem "fase da obra" nem "tipo de projeto", direto pra "já tem automação instalada").
+  var path = ['obra', 'existente', 'mensagem', 'nome', 'telefone'];
   var pos = 0;
 
   function render() {
@@ -47,14 +47,17 @@
       siblings.forEach(function (s) { s.classList.remove('selected'); });
       btn.classList.add('selected');
 
-      // Pergunta 1 (construindo/reformando) decide se o passo "fase da obra" entra no caminho
+      // Pergunta 1 (construindo/reformando) decide todo o resto do caminho:
+      // Sim -> fase da obra -> tipo de projeto -> mensagem (pula "já tem automação")
+      // Não -> já tem automação -> mensagem (pula fase da obra e tipo de projeto)
       if (field === 'obra') {
-        var faseIdx = path.indexOf('fase');
         if (value === 'Sim') {
-          if (faseIdx === -1) path.splice(1, 0, 'fase');
+          path = ['obra', 'fase', 'tipo', 'mensagem', 'nome', 'telefone'];
+          answers.existente = '';
         } else {
-          if (faseIdx !== -1) path.splice(faseIdx, 1);
+          path = ['obra', 'existente', 'mensagem', 'nome', 'telefone'];
           answers.fase = '';
+          answers.tipo = '';
         }
       }
 
@@ -112,7 +115,7 @@
       '\nTelefone: ' + telefone +
       '\nConstruindo/reformando: ' + obra +
       (fase ? '\nFase da obra: ' + fase : '') +
-      '\nTipo de projeto: ' + tipo +
+      (tipo ? '\nTipo de projeto: ' + tipo : '') +
       (existente ? '\nJá tem automação instalada: ' + existente : '') +
       (mensagem ? '\nDetalhes: ' + mensagem : '');
 
