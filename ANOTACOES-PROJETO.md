@@ -1,6 +1,7 @@
 # Anotações do projeto — Site Inovattive Home
 
-Última atualização: 23/07/2026
+Última atualização: 23/07/2026 (sessão longa — publicação final via HostGator ficou pra próxima
+conversa, ver seção "PRÓXIMO PASSO" no final deste arquivo)
 
 ## Estrutura do projeto
 
@@ -26,7 +27,22 @@ A pasta raiz (`inovattivehome-novo/`) é o site pronto. Estrutura atual:
 - Netlify: site `inovattivehome` (renomeado do nome aleatório original), linkado ao GitHub —
   **todo `git push` na branch `main` dispara deploy automático**. Não preciso fazer nada manual
   no Netlify depois de um push.
-- Site publicado em: inovattivehome.netlify.app (domínio próprio ainda não configurado).
+- Site publicado em: inovattivehome.netlify.app (domínio próprio ainda não configurado nele).
+- **Importante — mudança de plano de publicação**: o Cleverson decidiu que a publicação final
+  NÃO vai ser via Netlify/domínio próprio apontado pra lá. Vai ser direto na **HostGator**, que é
+  onde o WordPress atual já está hospedado — ou seja, o domínio inovattivehome.com.br não precisa
+  mudar de DNS nem de SSL, só troca de arquivos dentro da mesma hospedagem. Netlify continua
+  servindo só como ambiente de preview/teste até lá. Ver seção "PRÓXIMO PASSO" no final.
+- Tentei ativar GitHub Pages como espelho gratuito adicional (alternativa ao Netlify quando os
+  créditos free dele acabaram) — **bloqueado**: `api.github.com` está fora do allowlist do proxy
+  do sandbox (mesma limitação que já existia com a API do Netlify). `github.com` (usado pelo git
+  CLI) funciona normalmente, só a API é que não. Se precisar ativar Pages, tem que ser o Cleverson
+  clicando em Settings → Pages → branch main → Save, direto no navegador dele.
+- **Cache-busting é crítico**: todo `.html` referencia `css/style.css?vN` e `js/script.js?vN`.
+  Toda vez que eu mudo `style.css` ou `script.js`, preciso bumpar esse número em TODAS as 12
+  páginas, senão o celular do Cleverson serve a versão antiga do cache e ele vê bugs visuais que
+  já foram corrigidos (aconteceu pelo menos duas vezes nesta sessão). Versões atuais no fim desta
+  sessão: `style.css?v=11`, `script.js?v=5`.
 
 ## Padrão visual
 
@@ -122,17 +138,53 @@ Todos os 3 têm o selo "Avaliação no Google" (logo colorida) + 5 estrelas dour
 - Frase trocada: "Trabalhamos apenas com o que há de melhor no mundo" → "Trabalhamos com
   excelentes marcas nacionais e importadas"
 
+## Questionário dinâmico de contato (home, `#contato`, substitui o formulário antigo)
+Formulário virou um "quiz" estilo Typeform — uma pergunta por vez, com barra de progresso e
+"Passo X de Y" dinâmico (calculado em JS, não fixo, porque o caminho muda de tamanho conforme a
+resposta). Código em `js/script.js` (bloco `// Questionário dinâmico de contato`) + HTML em
+`index.html` dentro de `<form id="contact-form" class="quiz-form">`.
+
+**Fluxo atual (definido junto com o Cleverson, passou por 2 rodadas de ajuste):**
+1. "Você está construindo ou reformando?" (Sim/Não) — pergunta raiz que decide todo o resto:
+   - **Sim** → "Em que fase da obra você está?" (5 opções) → "Tipo de projeto" (Casa/Apto/
+     Cobertura/Escritório) → Detalhes → Nome → WhatsApp. (Pula a pergunta de automação existente
+     — não faz sentido perguntar isso pra quem tá construindo.)
+   - **Não** → vai direto pra "Você já tem algum sistema de automação instalado?" → Detalhes →
+     Nome → WhatsApp. (Pula fase da obra E tipo de projeto — só existem no caminho Sim.)
+2. O texto da pergunta "Detalhes" muda dinamicamente pra "...pro seu escritório" só se a pessoa
+   escolheu "Escritório / Corporativo" no Tipo de projeto — e **precisa resetar esse texto pro
+   padrão genérico se a pessoa voltar e trocar pra "Não"** (bug já corrigido: o texto ficava preso
+   em "escritório" mesmo depois de mudar de caminho, porque eu só atualizava o label ao clicar em
+   "tipo", nunca ao clicar em "obra"/Não).
+3. Ao final, monta uma mensagem de texto com todas as respostas e abre `wa.me` com o número da
+   Inovattive — mesma lógica de sempre, só que agora com mais campos (obra, fase, tipo, existente,
+   mensagem, nome, telefone — os que não foram perguntados no caminho escolhido saem vazios/somem
+   da mensagem).
+
+**Lição de CSS aprendida construindo isso**: regras genéricas antigas tipo `.contact-form button`
+e `.contact-form label` (classe + elemento = mais específicas que uma classe só) atropelavam meus
+estilos novos (`.quiz-option`, `.quiz-question`, `.quiz-back`) mesmo vindo depois no arquivo. Tive
+que aumentar a especificidade dos seletores novos (ex: `.quiz-options .quiz-option` em vez de só
+`.quiz-option`) pra vencer. Se for mexer nesse form de novo, prestar atenção nisso.
+
+## Página de Política de Privacidade (LGPD)
+Nova página `privacidade/index.html` (com `<meta name="robots" content="noindex, follow">` —
+proposital, página de utilidade não precisa competir no Google). Link "Política de Privacidade"
+adicionado no `.footer-note` de todas as 12 páginas. Cobre: quais dados o formulário coleta (nome,
+telefone, respostas do quiz), que os dados vão direto pro WhatsApp sem passar por banco de dados
+próprio, menção a cookies/Analytics futuros, direitos do titular (LGPD) e contato via WhatsApp
+pra exercer esses direitos. CSS novo: `.legal-content` em `style.css`.
+
 ## SEO / técnico
 - Auditoria feita comparando com o site antigo (inovattivehome.com.br, WordPress, será
   desativado). Aplicado: favicons completos (favicon.ico + PNGs + apple-touch-icon, gerados a
-  partir do ícone "IH" da logo) em todas as 11 páginas; 2 redirects 301 que faltavam no
-  `.htaccess` (`/home-b/` e `/sample-page/` → home).
+  partir do ícone "IH" da logo) em todas as páginas; 2 redirects 301 que faltavam no
+  `.htaccess` (`/home-b/` e `/sample-page/` → home); robots.txt e sitemap.xml já existiam e estão
+  ok (sitemap não inclui `/privacidade/` de propósito, por causa do noindex).
 - **Pendente**: Google Analytics (GA4), Google Tag Manager e/ou Google Ads — preciso dos IDs do
   Cleverson pra instalar. Ele ainda não passou. Perguntar de novo quando for relevante.
 
 ## Pendências técnicas
-- **Imagem grande não otimizada**: `img/brands/ubiquiti-produtos/rack-gerenciamento.png`
-  (1,7 MB) ainda não foi comprimida.
 - Marcas sem imagem de produto real ainda: AAT, Fibaro, Sonos, Lutron, Denon, Yamaha (só texto).
 - UniFi: 3 dos 6 cards ainda só com texto (Wi-Fi de Alta Capacidade, Segurança de Rede,
   Suporte Técnico).
@@ -140,7 +192,33 @@ Todos os 3 têm o selo "Avaliação no Google" (logo colorida) + 5 estrelas dour
   site (variações de cor do keypad IVOLV, módulo CANBUS, IR Blaster amplificado, algumas fotos
   de instalação real) — sem instrução ainda de onde/se usar.
 - GitHub PAT que o Cleverson colou em texto puro no chat em algum momento desta sessão —
-  recomendado (mas não confirmado) que ele revogue/gere um novo por segurança.
+  recomendado (mas não confirmado) que ele revogue/gere um novo por segurança. Ele pediu
+  explicitamente pra "deixar quieto por enquanto" — não insistir nisso sem ele trazer o assunto.
+- ~~Imagem grande não otimizada (`rack-gerenciamento.png`)~~ — **resolvido nesta sessão**:
+  1,7 MB → 424 KB (resize pra 800px, mesma qualidade, RGBA preservado).
+
+## PRÓXIMO PASSO (retomar daqui na próxima conversa)
+O Cleverson perguntou "falta alguma coisa pra publicarmos de verdade?" — respondi com o punch
+list acima (analytics, fotos faltando, LGPD, imagem grande) e ele decidiu: fazer a LGPD e a
+compressão agora (feito), deixar o token quieto, e a publicação final vai ser **direto na
+HostGator** (mesma hospedagem do WordPress atual), mantendo o WordPress como backup de segurança
+— **não vamos usar Netlify com domínio próprio**. Ele pediu pra eu ensinar o passo a passo, mas
+decidimos continuar isso na próxima sessão. O roteiro que já expliquei pra ele (repetir/expandir
+quando ele voltar):
+
+1. Backup completo no cPanel (Backup Wizard — arquivos + banco MySQL) antes de qualquer coisa.
+2. NÃO apagar o WordPress: renomear a pasta `public_html` atual pra algo tipo
+   `public_html_wordpress_backup` (ou mover pra uma subpasta), em vez de deletar.
+3. Não apagar o banco de dados MySQL do WordPress — pode ficar existindo sem uso.
+4. Criar `public_html` nova e vazia, subir todos os arquivos do site novo (via File Manager +
+   zip/extract, ou via FTP/FileZilla com as credenciais que ficam em "Contas FTP" no cPanel).
+5. Testar tudo pelo domínio real depois: navegação entre páginas, o questionário de contato
+   (os dois caminhos, Sim e Não), os links de WhatsApp e Instagram/Facebook/YouTube.
+
+Ele ainda não disse se quer que eu prepare um zip pronto pra ele soltar no File Manager, ou se
+quer que eu vá guiando em tempo real enquanto ele mexe no cPanel — perguntar isso quando ele
+voltar ao assunto. Eu não tenho (e não devo pedir) as credenciais do cPanel/FTP dele — isso é
+ação que só ele pode fazer, eu só oriento.
 
 ## Bugs corrigidos
 - **Menu sumia no mobile**: adicionado botão hambúrguer (`.nav-toggle`) em todas as 11 páginas +
