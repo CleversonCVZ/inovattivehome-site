@@ -4,19 +4,37 @@
   if (!form) return;
   var WHATSAPP_NUMBER = '5541991510243';
 
-  var steps = Array.prototype.slice.call(form.querySelectorAll('.quiz-step'));
-  if (!steps.length) return; // formulário antigo (sem quiz) — não faz nada
-  var progressBar = document.getElementById('quiz-progress-bar');
-  var answers = {};
-  var current = 0;
+  var allSteps = {};
+  form.querySelectorAll('.quiz-step').forEach(function (el) {
+    allSteps[el.getAttribute('data-step')] = el;
+  });
+  if (!Object.keys(allSteps).length) return; // formulário antigo (sem quiz) — não faz nada
 
-  function goTo(index) {
-    if (index < 0 || index >= steps.length) return;
-    steps[current].classList.remove('active');
-    current = index;
-    steps[current].classList.add('active');
-    progressBar.style.width = ((current + 1) / steps.length * 100) + '%';
+  var progressBar = document.getElementById('quiz-progress-bar');
+  var stepCountEl = document.getElementById('quiz-step-count');
+  var answers = {};
+  // Caminho padrão (quem responde "Não" pra 1ª pergunta segue direto por aqui).
+  // Se responder "Sim", o passo "fase" é inserido logo depois de "obra".
+  var path = ['obra', 'tipo', 'existente', 'mensagem', 'nome', 'telefone'];
+  var pos = 0;
+
+  function render() {
+    Object.keys(allSteps).forEach(function (key) {
+      allSteps[key].classList.remove('active');
+    });
+    var key = path[pos];
+    allSteps[key].classList.add('active');
+    if (progressBar) progressBar.style.width = ((pos + 1) / path.length * 100) + '%';
+    if (stepCountEl) stepCountEl.textContent = 'Passo ' + (pos + 1) + ' de ' + path.length;
   }
+
+  function goTo(newPos) {
+    if (newPos < 0 || newPos >= path.length) return;
+    pos = newPos;
+    render();
+  }
+
+  render();
 
   // Perguntas de múltipla escolha: seleciona, guarda a resposta e avança sozinho
   form.querySelectorAll('.quiz-option').forEach(function (btn) {
@@ -29,6 +47,17 @@
       siblings.forEach(function (s) { s.classList.remove('selected'); });
       btn.classList.add('selected');
 
+      // Pergunta 1 (construindo/reformando) decide se o passo "fase da obra" entra no caminho
+      if (field === 'obra') {
+        var faseIdx = path.indexOf('fase');
+        if (value === 'Sim') {
+          if (faseIdx === -1) path.splice(1, 0, 'fase');
+        } else {
+          if (faseIdx !== -1) path.splice(faseIdx, 1);
+          answers.fase = '';
+        }
+      }
+
       // Ajusta o texto da pergunta seguinte conforme o tipo de projeto escolhido
       if (field === 'tipo') {
         var label = document.getElementById('quiz-mensagem-label');
@@ -39,26 +68,26 @@
         }
       }
 
-      setTimeout(function () { goTo(current + 1); }, 250);
+      setTimeout(function () { goTo(pos + 1); }, 250);
     });
   });
 
   // Botões "Voltar"
   form.querySelectorAll('.quiz-back').forEach(function (btn) {
-    btn.addEventListener('click', function () { goTo(current - 1); });
+    btn.addEventListener('click', function () { goTo(pos - 1); });
   });
 
   // Botões "Continuar" (passos com campo de texto): valida antes de avançar
   form.querySelectorAll('.quiz-next').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var step = steps[current];
+      var step = allSteps[path[pos]];
       var required = step.querySelector('[required]');
       if (required && !required.value.trim()) {
         required.focus();
         required.reportValidity();
         return;
       }
-      goTo(current + 1);
+      goTo(pos + 1);
     });
   });
 
@@ -74,11 +103,15 @@
     var nome = document.getElementById('quiz-nome').value.trim();
     var telefone = telefoneInput.value.trim();
     var mensagem = document.getElementById('quiz-mensagem').value.trim();
+    var obra = answers.obra || '';
+    var fase = answers.fase || '';
     var tipo = answers.tipo || '';
     var existente = answers.existente || '';
 
     var texto = 'Olá! Meu nome é ' + nome + '.' +
       '\nTelefone: ' + telefone +
+      '\nConstruindo/reformando: ' + obra +
+      (fase ? '\nFase da obra: ' + fase : '') +
       '\nTipo de projeto: ' + tipo +
       (existente ? '\nJá tem automação instalada: ' + existente : '') +
       (mensagem ? '\nDetalhes: ' + mensagem : '');

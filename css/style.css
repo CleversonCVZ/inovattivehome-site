@@ -778,7 +778,7 @@ section { padding: 110px 0; }
 }
 .quiz-progress-bar {
   height: 100%;
-  width: 20%;
+  width: 16.6667%;
   background: var(--brass);
   transition: width 0.35s ease;
 }

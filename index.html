@@ -685,9 +685,31 @@
 
     <form class="contact-form quiz-form" id="contact-form" novalidate>
       <div class="quiz-progress"><div class="quiz-progress-bar" id="quiz-progress-bar"></div></div>
+      <p class="quiz-step-count" id="quiz-step-count">Passo 1 de 6</p>
 
-      <div class="quiz-step active" data-step="1">
-        <p class="quiz-step-count">Passo 1 de 5</p>
+      <div class="quiz-step active" data-step="obra">
+        <p class="quiz-question">Você está construindo ou reformando?</p>
+        <div class="quiz-options">
+          <button type="button" class="quiz-option" data-field="obra" data-value="Sim">Sim</button>
+          <button type="button" class="quiz-option" data-field="obra" data-value="Não">Não</button>
+        </div>
+      </div>
+
+      <div class="quiz-step" data-step="fase">
+        <p class="quiz-question">Em que fase da obra você está?</p>
+        <div class="quiz-options">
+          <button type="button" class="quiz-option" data-field="fase" data-value="Em projeto ainda">Em projeto ainda</button>
+          <button type="button" class="quiz-option" data-field="fase" data-value="Fase cinza">Fase cinza</button>
+          <button type="button" class="quiz-option" data-field="fase" data-value="Alvenaria">Alvenaria</button>
+          <button type="button" class="quiz-option" data-field="fase" data-value="Já estamos terminando">Já estamos terminando</button>
+          <button type="button" class="quiz-option" data-field="fase" data-value="Já está em uso">Já está em uso</button>
+        </div>
+        <div class="quiz-nav quiz-nav-back-only">
+          <button type="button" class="quiz-back">&larr; Voltar</button>
+        </div>
+      </div>
+
+      <div class="quiz-step" data-step="tipo">
         <p class="quiz-question">Qual tipo de projeto você tem em mente?</p>
         <div class="quiz-options">
           <button type="button" class="quiz-option" data-field="tipo" data-value="Casa / Residência">Casa / Residência</button>
@@ -695,10 +717,12 @@
           <button type="button" class="quiz-option" data-field="tipo" data-value="Cobertura">Cobertura</button>
           <button type="button" class="quiz-option" data-field="tipo" data-value="Escritório / Corporativo">Escritório / Corporativo</button>
         </div>
+        <div class="quiz-nav quiz-nav-back-only">
+          <button type="button" class="quiz-back">&larr; Voltar</button>
+        </div>
       </div>
 
-      <div class="quiz-step" data-step="2">
-        <p class="quiz-step-count">Passo 2 de 5</p>
+      <div class="quiz-step" data-step="existente">
         <p class="quiz-question">Você já tem algum sistema de automação instalado?</p>
         <div class="quiz-options">
           <button type="button" class="quiz-option" data-field="existente" data-value="Sim">Sim</button>
@@ -710,8 +734,7 @@
         </div>
       </div>
 
-      <div class="quiz-step" data-step="3">
-        <p class="quiz-step-count">Passo 3 de 5</p>
+      <div class="quiz-step" data-step="mensagem">
         <label for="quiz-mensagem" class="quiz-question" id="quiz-mensagem-label">Conte um pouco sobre o que você imagina pro seu projeto</label>
         <textarea id="quiz-mensagem" name="mensagem" rows="4" placeholder="Ex: quero automatizar iluminação, som e cortinas da sala e dos quartos..."></textarea>
         <div class="quiz-nav">
@@ -720,8 +743,7 @@
         </div>
       </div>
 
-      <div class="quiz-step" data-step="4">
-        <p class="quiz-step-count">Passo 4 de 5</p>
+      <div class="quiz-step" data-step="nome">
         <label for="quiz-nome" class="quiz-question">Qual o seu nome?</label>
         <input type="text" id="quiz-nome" name="nome" placeholder="Seu nome completo" required>
         <div class="quiz-nav">
@@ -730,8 +752,7 @@
         </div>
       </div>
 
-      <div class="quiz-step" data-step="5">
-        <p class="quiz-step-count">Passo 5 de 5</p>
+      <div class="quiz-step" data-step="telefone">
         <label for="quiz-telefone" class="quiz-question">Qual o melhor WhatsApp pra te chamar?</label>
         <input type="tel" id="quiz-telefone" name="telefone" placeholder="(41) 99999-9999" required>
         <div class="quiz-nav">
