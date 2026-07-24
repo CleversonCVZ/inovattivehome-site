@@ -1124,6 +1124,32 @@ section { padding: 110px 0; }
   .whatsapp-float svg { width: 26px; height: 26px; }
 }
 
+/* Página de Política de Privacidade / LGPD */
+.legal-content { padding: 70px 0 100px; }
+.legal-content .wrap { max-width: 760px; }
+.legal-content h2 {
+  font-size: 24px;
+  margin: 44px 0 14px;
+}
+.legal-content h2:first-of-type { margin-top: 0; }
+.legal-content p, .legal-content li {
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--ink-dim);
+  margin: 0 0 16px;
+}
+.legal-content ul { padding-left: 20px; margin: 0 0 16px; }
+.legal-content li { margin-bottom: 8px; }
+.legal-content strong { color: var(--ink); font-weight: 600; }
+.legal-content .updated-note {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brass);
+  margin-bottom: 30px;
+}
+
 /* CTA WhatsApp entre seções (somente mobile) */
 .mobile-whatsapp-cta { display: none; }
 @media (max-width: 860px) {
