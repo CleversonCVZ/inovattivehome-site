@@ -1,7 +1,8 @@
 # Anotações do projeto — Site Inovattive Home
 
-Última atualização: 23/07/2026 (sessão longa — publicação final via HostGator ficou pra próxima
-conversa, ver seção "PRÓXIMO PASSO" no final deste arquivo)
+Última atualização: 24/07/2026 — **SITE PUBLICADO DE VERDADE em inovattivehome.com.br** (migração
+concluída com sucesso, ver "Publicação na HostGator" abaixo). O WordPress antigo virou backup,
+não está mais no ar.
 
 ## Estrutura do projeto
 
@@ -27,12 +28,11 @@ A pasta raiz (`inovattivehome-novo/`) é o site pronto. Estrutura atual:
 - Netlify: site `inovattivehome` (renomeado do nome aleatório original), linkado ao GitHub —
   **todo `git push` na branch `main` dispara deploy automático**. Não preciso fazer nada manual
   no Netlify depois de um push.
-- Site publicado em: inovattivehome.netlify.app (domínio próprio ainda não configurado nele).
-- **Importante — mudança de plano de publicação**: o Cleverson decidiu que a publicação final
-  NÃO vai ser via Netlify/domínio próprio apontado pra lá. Vai ser direto na **HostGator**, que é
-  onde o WordPress atual já está hospedado — ou seja, o domínio inovattivehome.com.br não precisa
-  mudar de DNS nem de SSL, só troca de arquivos dentro da mesma hospedagem. Netlify continua
-  servindo só como ambiente de preview/teste até lá. Ver seção "PRÓXIMO PASSO" no final.
+- Site publicado em: inovattivehome.netlify.app — mas isso agora é só ambiente de **preview/teste**.
+  A produção de verdade é a HostGator (ver seção "Publicação na HostGator" abaixo). Continuo
+  fazendo push pro GitHub a cada mudança (assim o Netlify preview também atualiza), mas pra
+  qualquer mudança valer no site real, precisa também repetir os passos de upload na HostGator —
+  **não é automático como era com o Netlify**.
 - Tentei ativar GitHub Pages como espelho gratuito adicional (alternativa ao Netlify quando os
   créditos free dele acabaram) — **bloqueado**: `api.github.com` está fora do allowlist do proxy
   do sandbox (mesma limitação que já existia com a API do Netlify). `github.com` (usado pelo git
@@ -197,28 +197,42 @@ pra exercer esses direitos. CSS novo: `.legal-content` em `style.css`.
 - ~~Imagem grande não otimizada (`rack-gerenciamento.png`)~~ — **resolvido nesta sessão**:
   1,7 MB → 424 KB (resize pra 800px, mesma qualidade, RGBA preservado).
 
-## PRÓXIMO PASSO (retomar daqui na próxima conversa)
-O Cleverson perguntou "falta alguma coisa pra publicarmos de verdade?" — respondi com o punch
-list acima (analytics, fotos faltando, LGPD, imagem grande) e ele decidiu: fazer a LGPD e a
-compressão agora (feito), deixar o token quieto, e a publicação final vai ser **direto na
-HostGator** (mesma hospedagem do WordPress atual), mantendo o WordPress como backup de segurança
-— **não vamos usar Netlify com domínio próprio**. Ele pediu pra eu ensinar o passo a passo, mas
-decidimos continuar isso na próxima sessão. O roteiro que já expliquei pra ele (repetir/expandir
-quando ele voltar):
+## Publicação na HostGator (feita em 24/07/2026 — MIGRAÇÃO CONCLUÍDA)
+O site novo está publicado de verdade em inovattivehome.com.br, hospedado na HostGator (cPanel,
+conta `ino59204`). Passo a passo que seguimos (guiado por prints, o Cleverson mexendo no cPanel
+enquanto eu orientava — não tenho nem devo ter as credenciais do cPanel/FTP dele):
 
-1. Backup completo no cPanel (Backup Wizard — arquivos + banco MySQL) antes de qualquer coisa.
-2. NÃO apagar o WordPress: renomear a pasta `public_html` atual pra algo tipo
-   `public_html_wordpress_backup` (ou mover pra uma subpasta), em vez de deletar.
-3. Não apagar o banco de dados MySQL do WordPress — pode ficar existindo sem uso.
-4. Criar `public_html` nova e vazia, subir todos os arquivos do site novo (via File Manager +
-   zip/extract, ou via FTP/FileZilla com as credenciais que ficam em "Contas FTP" no cPanel).
-5. Testar tudo pelo domínio real depois: navegação entre páginas, o questionário de contato
-   (os dois caminhos, Sim e Não), os links de WhatsApp e Instagram/Facebook/YouTube.
+1. Backup completo no cPanel (Backup Wizard — arquivos + banco MySQL) feito antes de tudo.
+2. Em vez de renomear, ele **copiou** a `public_html` inteira (WordPress) pra uma pasta
+   `public_html_backup` — conferimos que os tamanhos de arquivo batiam entre as duas (inclusive
+   o `wp-content/uploads`, que tinha um `2024.zip` de 337 MB — bateu certinho).
+3. Esvaziou a `public_html` original (Selecionar tudo + Excluir — foi pra lixeira do cPanel, não
+   apagou de vez).
+4. Baixou o zip do site direto do GitHub (`https://github.com/CleversonCVZ/inovattivehome-site/archive/refs/heads/main.zip`)
+   no próprio Mac, subiu na `public_html` vazia via "Carregar", e extraiu.
+5. **Pegadinha que rolou**: o Gerenciador de Arquivos do cPanel esconde arquivos ocultos por
+   padrão, então "Selecionar tudo" na pasta extraída não pegava `.htaccess` nem `.gitignore` —
+   precisou ativar "mostrar arquivos ocultos" nas Configurações e mover esses dois separadamente.
+   Se for orientar isso de novo (em outra conta HostGator, por exemplo), já avisar esse detalhe
+   de cara.
+6. Também descobriu (depois de mostrar os ocultos) que a `public_html` já tinha uns arquivos
+   soltos de versões antigas do `.htaccess` do WordPress (`.htaccess.nfd-backup`,
+   `.htaccess.phpupgrader.*`, `.user.ini`) que a exclusão do passo 3 não pegou (mesma razão:
+   estavam ocultos). Apagamos — não fazem falta pro site estático.
+7. Apagou a pasta vazia da extração, o zip, e o `ANOTACOES-PROJETO.md` (esse arquivo não deve
+   ficar público no servidor — só existe aqui no repositório/pasta do projeto).
+8. Manteve a pasta `.well-known` intocada (importante pra renovação do certificado SSL).
+9. Testou pelo domínio real — carregou perfeito, com a fonte, hero, menu, WhatsApp float etc.
 
-Ele ainda não disse se quer que eu prepare um zip pronto pra ele soltar no File Manager, ou se
-quer que eu vá guiando em tempo real enquanto ele mexe no cPanel — perguntar isso quando ele
-voltar ao assunto. Eu não tenho (e não devo pedir) as credenciais do cPanel/FTP dele — isso é
-ação que só ele pode fazer, eu só oriento.
+**Fluxo de manutenção daqui pra frente (mudou! ler com atenção):**
+Como a produção agora é a HostGator (não é mais deploy automático via Netlify), qualquer alteração
+pontual no site precisa de DOIS passos: (1) eu edito o arquivo localmente e faço push pro GitHub
+como sempre (isso atualiza o preview no Netlify e mantém o histórico), e (2) o Cleverson (ou eu
+orientando) precisa subir manualmente só o(s) arquivo(s) que mudaram pro `public_html` da
+HostGator via cPanel File Manager — **não precisa refazer o processo todo de zip/extração**, só
+sobrescrever o arquivo específico que mudou (ex: se só mudei `css/style.css`, é só fazer upload
+desse arquivo dentro da pasta `css/` do `public_html`, substituindo o antigo). Se mudar vários
+arquivos de uma vez, aí sim vale considerar zipar de novo.
 
 ## Bugs corrigidos
 - **Menu sumia no mobile**: adicionado botão hambúrguer (`.nav-toggle`) em todas as 11 páginas +
