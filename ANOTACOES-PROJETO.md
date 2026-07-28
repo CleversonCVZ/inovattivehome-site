@@ -183,11 +183,51 @@ pra exercer esses direitos. CSS novo: `.legal-content` em `style.css`.
   ok (sitemap não inclui `/privacidade/` de propósito, por causa do noindex).
 - ~~Google Tag Manager~~ — **instalado em 24/07/2026**: container `GTM-NXWMRC7` (passado pelo
   Felipe Gabriel via WhatsApp). Script no `<head>` (logo após a abertura) + `<noscript><iframe>`
-  logo após a abertura do `<body>`, nas 12 páginas. **Ainda não republicado na HostGator** depois
-  dessa mudança — lembrar de repetir o fluxo de zip (ver seção acima) quando o Cleverson topar.
-  GA4 (measurement ID) e Google Ads (conversion ID) continuam pendentes — se ele configurar isso
-  DENTRO do próprio GTM (o normal, é pra isso que o GTM serve), pode nem precisar mexer no código
-  do site de novo, só configurar as tags lá no painel do Tag Manager.
+  logo após a abertura do `<body>`, nas 12 páginas. Já republicado na HostGator (o Cleverson
+  refez o fluxo de zip e confirmou "feito").
+- **Tracking GTM → GA4/Ads (24/07/2026, sessão de verificação pós-instalação):**
+  - O Felipe (Mkt) tinha passado um Measurement ID errado: `G-DTG9C2PDMD`. Esse ID **não pertence
+    a nenhuma stream da conta GA4 "InovattiveHome"** — provavelmente veio de outra conta/cliente
+    dele por engano.
+  - O Measurement ID **certo** da propriedade GA4 do domínio real (`https://inovattivehome.com.br`,
+    stream chamada "ExactMetrics" — resquício de quando o WordPress antigo usava o plugin
+    ExactMetrics) é **`G-LHHVNQRLN3`**.
+  - Há uma segunda stream na mesma propriedade, "inovativehome.com.br - GA4" (repara: domínio
+    grafado errado, com um só "t", e em `http://`) com o measurement ID `G-Y42H68W1P8` — é lixo/
+    resquício, não é o site real, **ignorar essa stream**.
+  - Corrigido dentro do próprio GTM (sem mexer em código): a tag "GA4 - Inovattive Home" (tipo
+    Google Tag, dispara em Initialization - All Pages) e a tag "GA4 - Lead WhatsApp" (ver abaixo)
+    tiveram o ID trocado de `G-DTG9C2PDMD` para `G-LHHVNQRLN3`. Publicado (Version 12 do container).
+  - Depois da correção, confirmado via Realtime do GA4 (propriedade certa) que `page_view`,
+    `first_visit`, `session_start` e `user_engagement` já estavam chegando certinho.
+  - **Conversão de lead no clique do WhatsApp — já existia parcialmente:** o Felipe já tinha
+    configurado, há ~16 dias, um acionador "Lead - Whatsapp" (Click - Just Links, regex
+    `wa\.link|api\.whatsapp\.com|wa\.me`) ligado a uma tag "Lead - WhatsApp" do tipo **Google Ads
+    Conversion Tracking** (conversion ID 858649025, label `sn4pCMbr78wcEMHjt5kD`) — ou seja, cliques
+    no WhatsApp já contavam como conversão no Google Ads.
+  - **O que faltava pro GA4 (criado nesta sessão):** tag nova "GA4 - Lead WhatsApp" (tipo Google
+    Analytics: GA4 Event, Measurement ID `G-LHHVNQRLN3`, Event Name `generate_lead`), disparando
+    no mesmo acionador "Lead - Whatsapp". Criada, salva e publicada junto com a correção do ID.
+  - **RESOLVIDO (28/07/2026):** o clique no WhatsApp não estava disparando "Link Click" nenhum
+    no GTM (nem em links de teste neutros tipo "Fale com um especialista"). Causa: o acionador
+    "Lead - Whatsapp" estava com **"Wait for Tags" marcado** (max wait 2000ms). Corrigido
+    desmarcando essa opção em Triggers → "Lead - Whatsapp" → editar → desmarcar "Wait for Tags" →
+    Save → Submit → Publish. Depois disso, testado (via outro computador com Chrome + Claude in
+    Chrome, já que este Mac só tem Safari e o modo Preview do GTM não estava confirmando o clique
+    por aqui) e confirmado: clique no botão do WhatsApp agora dispara certinho tanto a tag "Lead -
+    WhatsApp" (conversão Google Ads) quanto "GA4 - Lead WhatsApp" (evento `generate_lead` no GA4,
+    Measurement ID `G-LHHVNQRLN3`). **Rastreamento de ponta a ponta confirmado funcionando.**
+  - Ainda não testado especificamente: o clique no WhatsApp que sai do **formulário-quiz** da home
+    (o que monta a mensagem dinamicamente via JS e faz `window.location`/abre a URL), diferente do
+    botão flutuante fixo e dos CTAs mobile (que são `<a href>` normais). Vale testar esse caminho
+    separado se quiser ter certeza que o quiz também conta como lead — o acionador "Lead -
+    Whatsapp" (Just Links, regex `wa\.link|api\.whatsapp\.com|wa\.me`) só captura cliques reais em
+    tags `<a>`, então se o quiz usa navegação via JS sem um `<a href>` real sendo clicado, pode não
+    ser pego. Verificar antes de assumir que está 100% coberto.
+  - Onde ver os dados: GA4 → Reports → Realtime overview (instantâneo) ou Reports → Engagement →
+    Events (relatório padrão, delay de horas pra atualizar) — procurar pelo evento `generate_lead`.
+    Pra virar "conversão" oficial dentro do próprio GA4: Admin → Events → `generate_lead` → "Mark
+    as key event" (opcional, o Google Ads já conta a conversão de qualquer forma via tag própria).
 
 ## Pendências técnicas
 - Marcas sem imagem de produto real ainda: AAT, Fibaro, Sonos, Lutron, Denon, Yamaha (só texto).

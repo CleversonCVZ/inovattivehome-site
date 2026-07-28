@@ -123,6 +123,13 @@
       (mensagem ? '\nDetalhes: ' + mensagem : '');
 
     var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(texto);
+
+    window.dataLayer = window.dataLayer || [];
+    dataLayer.push({
+      event: 'whatsapp_lead_form',
+      form_id: 'contact-form'
+    });
+
     window.open(url, '_blank');
   });
 })();
