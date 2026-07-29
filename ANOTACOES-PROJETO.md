@@ -309,10 +309,33 @@ Funcionou, mas com 2 detalhes pra lembrar sempre que repetir:
   ativado no Gerenciador de Arquivos pra aparecerem na pasta extraída antes de mover.
 
 ## Mensagem padrão nos links de WhatsApp
-Todo link direto pro WhatsApp (botão flutuante `.whatsapp-float` nas 12 páginas + os 3 CTAs mobile
-"Chamar no WhatsApp" na home) agora abre com a mensagem pré-preenchida **"Olá! Vim do site e
-queria mais informações."** via parâmetro `?text=` na URL do `wa.me`. O questionário dinâmico de
-contato (`js/script.js`) continua com sua própria mensagem detalhada, não foi mexido.
+Único link que ainda abre o WhatsApp direto (sem passar pelo formulário) é o botão flutuante
+`.whatsapp-float` (canto inferior direito, nas 12 páginas) — decisão explícita do Cleverson.
+Abre com a mensagem pré-preenchida **"Olá! Vim do site e queria mais informações."** via
+parâmetro `?text=` na URL do `wa.me`. O questionário dinâmico de contato (`js/script.js`) continua
+com sua própria mensagem, montada a partir das respostas.
+
+## Todos os CTAs levam pro formulário, não mais direto pro WhatsApp (29/07/2026)
+Antes, os 3 banners mobile "Fale agora com um especialista." (que apareciam entre seções, só no
+mobile) abriam o WhatsApp direto, com `target="_blank"` pro `wa.me`. O Cleverson achou inconsistente
+com o resto do site (nav "Fale com um especialista" e hero "Solicitar um projeto" já levavam pro
+formulário) e pediu pra padronizar: **só o balão verde flutuante abre WhatsApp direto — todo o
+resto (nav, hero, os 3 banners mobile, e "Solicitar um projeto" nas 11 outras páginas) leva pro
+formulário `#contact-form`.**
+- Mudei o `href` desses 3 banners de `wa.me/...` pra `#contact-form`, removi `target="_blank"`/
+  `rel="noopener"` (agora é âncora na própria página), e troquei o texto do botão de "Chamar no
+  WhatsApp" pra "Solicitar um projeto" (pra não ficar prometendo WhatsApp e entregar formulário).
+- Troquei TODOS os `href="#contato"` (que apontavam pro topo da seção `<section id="contato">`,
+  que tem a lista de contato — WhatsApp/telefone/Instagram/etc — antes do formulário) por
+  `href="#contact-form"` (o `id` do próprio `<form>`), em `index.html` e nas 11 outras páginas
+  (via `../index.html#contact-form`). Isso porque rolar só até `#contato` deixava o usuário
+  vendo a lista de contato, não o formulário em si — especialmente ruim no mobile, onde a lista é
+  grande e empurra o form bem pra baixo.
+- Adicionei `#contact-form { scroll-margin-top: 96px; }` no `style.css` (mesma folga que as
+  `section[id]` já tinham) pra o formulário não ficar escondido atrás do menu fixo ao rolar até
+  ele.
+- Texto da 1ª pergunta do quiz mudou de "Você está construindo ou reformando?" pra "Está
+  construindo/reformando?" (só o texto, lógica/valores Sim/Não intactos).
 
 ## Bugs corrigidos
 - **Menu sumia no mobile**: adicionado botão hambúrguer (`.nav-toggle`) em todas as 11 páginas +
