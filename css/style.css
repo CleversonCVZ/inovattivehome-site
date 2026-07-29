@@ -43,6 +43,9 @@ body.page-leaving {
 
 /* folga pra seções não ficarem escondidas atrás do header fixo ao rolar até uma âncora */
 section[id] { scroll-margin-top: 96px; }
+/* o CTA "Fale com um especialista"/"Solicitar um projeto" leva direto pro formulário
+   (não só pro topo da seção de contato), então precisa da mesma folga */
+#contact-form { scroll-margin-top: 96px; }
 
 @media (prefers-reduced-motion: reduce) {
   body { animation: none; opacity: 1; }
