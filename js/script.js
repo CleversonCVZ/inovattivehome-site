@@ -15,7 +15,7 @@
   var answers = {};
   // Caminho padrão (quem responde "Não" pra 1ª pergunta segue direto por aqui,
   // sem "fase da obra" nem "tipo de projeto", direto pra "já tem automação instalada").
-  var path = ['obra', 'existente', 'mensagem', 'nome', 'telefone'];
+  var path = ['obra', 'existente', 'nome'];
   var pos = 0;
 
   function render() {
@@ -48,29 +48,16 @@
       btn.classList.add('selected');
 
       // Pergunta 1 (construindo/reformando) decide todo o resto do caminho:
-      // Sim -> fase da obra -> tipo de projeto -> mensagem (pula "já tem automação")
-      // Não -> já tem automação -> mensagem (pula fase da obra e tipo de projeto)
+      // Sim -> fase da obra -> tipo de projeto -> nome (pula "já tem automação")
+      // Não -> já tem automação -> nome (pula fase da obra e tipo de projeto)
       if (field === 'obra') {
-        var mensagemLabel = document.getElementById('quiz-mensagem-label');
         if (value === 'Sim') {
-          path = ['obra', 'fase', 'tipo', 'mensagem', 'nome', 'telefone'];
+          path = ['obra', 'fase', 'tipo', 'nome'];
           answers.existente = '';
         } else {
-          path = ['obra', 'existente', 'mensagem', 'nome', 'telefone'];
+          path = ['obra', 'existente', 'nome'];
           answers.fase = '';
           answers.tipo = '';
-          // "Tipo de projeto" não é perguntado neste caminho — texto volta ao padrão
-          if (mensagemLabel) mensagemLabel.textContent = 'Conte um pouco sobre o que você imagina pro seu projeto';
-        }
-      }
-
-      // Ajusta o texto da pergunta seguinte conforme o tipo de projeto escolhido
-      if (field === 'tipo') {
-        var label = document.getElementById('quiz-mensagem-label');
-        if (label) {
-          label.textContent = value === 'Escritório / Corporativo'
-            ? 'Conte um pouco sobre o que você imagina pro seu escritório'
-            : 'Conte um pouco sobre o que você imagina pro seu projeto';
         }
       }
 
@@ -99,28 +86,24 @@
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var telefoneInput = document.getElementById('quiz-telefone');
-    if (!telefoneInput.value.trim()) {
-      telefoneInput.focus();
-      telefoneInput.reportValidity();
+    var nomeInput = document.getElementById('quiz-nome');
+    if (!nomeInput.value.trim()) {
+      nomeInput.focus();
+      nomeInput.reportValidity();
       return;
     }
 
-    var nome = document.getElementById('quiz-nome').value.trim();
-    var telefone = telefoneInput.value.trim();
-    var mensagem = document.getElementById('quiz-mensagem').value.trim();
+    var nome = nomeInput.value.trim();
     var obra = answers.obra || '';
     var fase = answers.fase || '';
     var tipo = answers.tipo || '';
     var existente = answers.existente || '';
 
     var texto = 'Olá! Meu nome é ' + nome + '.' +
-      '\nTelefone: ' + telefone +
       '\nConstruindo/reformando: ' + obra +
       (fase ? '\nFase da obra: ' + fase : '') +
       (tipo ? '\nTipo de projeto: ' + tipo : '') +
-      (existente ? '\nJá tem automação instalada: ' + existente : '') +
-      (mensagem ? '\nDetalhes: ' + mensagem : '');
+      (existente ? '\nJá tem automação instalada: ' + existente : '');
 
     var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(texto);
 
