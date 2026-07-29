@@ -144,22 +144,28 @@ Formulário virou um "quiz" estilo Typeform — uma pergunta por vez, com barra 
 resposta). Código em `js/script.js` (bloco `// Questionário dinâmico de contato`) + HTML em
 `index.html` dentro de `<form id="contact-form" class="quiz-form">`.
 
-**Fluxo atual (definido junto com o Cleverson, passou por 2 rodadas de ajuste):**
+**Fluxo atual (definido junto com o Cleverson, passou por 3 rodadas de ajuste):**
 1. "Você está construindo ou reformando?" (Sim/Não) — pergunta raiz que decide todo o resto:
    - **Sim** → "Em que fase da obra você está?" (5 opções) → "Tipo de projeto" (Casa/Apto/
-     Cobertura/Escritório) → Detalhes → Nome → WhatsApp. (Pula a pergunta de automação existente
-     — não faz sentido perguntar isso pra quem tá construindo.)
-   - **Não** → vai direto pra "Você já tem algum sistema de automação instalado?" → Detalhes →
-     Nome → WhatsApp. (Pula fase da obra E tipo de projeto — só existem no caminho Sim.)
-2. O texto da pergunta "Detalhes" muda dinamicamente pra "...pro seu escritório" só se a pessoa
-   escolheu "Escritório / Corporativo" no Tipo de projeto — e **precisa resetar esse texto pro
-   padrão genérico se a pessoa voltar e trocar pra "Não"** (bug já corrigido: o texto ficava preso
-   em "escritório" mesmo depois de mudar de caminho, porque eu só atualizava o label ao clicar em
-   "tipo", nunca ao clicar em "obra"/Não).
-3. Ao final, monta uma mensagem de texto com todas as respostas e abre `wa.me` com o número da
-   Inovattive — mesma lógica de sempre, só que agora com mais campos (obra, fase, tipo, existente,
-   mensagem, nome, telefone — os que não foram perguntados no caminho escolhido saem vazios/somem
-   da mensagem).
+     Cobertura/Escritório) → Nome → WhatsApp. 3 passos + obra = 4 no total. (Pula a pergunta de
+     automação existente — não faz sentido perguntar isso pra quem tá construindo.)
+   - **Não** → vai direto pra "Você já tem algum sistema de automação instalado?" → Nome →
+     WhatsApp. 2 passos + obra = 3 no total. (Pula fase da obra E tipo de projeto — só existem no
+     caminho Sim.)
+2. Ao final, monta uma mensagem de texto com as respostas e abre `wa.me` com o número da
+   Inovattive.
+
+**28/07/2026 — removidos os passos "Detalhes" (textarea) e "Telefone"** a pedido do Cleverson:
+a ideia é diminuir o trabalho do lead pra ele decidir chamar, e o telefone já fica visível pra
+Inovattive de qualquer jeito assim que a conversa chega no WhatsApp (não faz sentido perguntar de
+novo dentro do form). O botão final "Enviar pelo WhatsApp" (antes no passo "telefone") foi movido
+pro passo "nome", que agora é sempre o último de qualquer caminho. A mensagem enviada não tem mais
+linhas de "Telefone:" nem "Detalhes:". Testado com Node+jsdom simulando os dois caminhos (Sim e
+Não) — ambos funcionando, contagem de passos dinâmica ("Passo X de Y") correta em cada um.
+
+~~O texto da pergunta "Detalhes" mudava dinamicamente pra "...pro seu escritório"~~ — não existe
+mais, o passo "Detalhes" foi removido (ver acima). O texto/JS relacionado a esse label dinâmico
+também foi removido do `script.js`.
 
 **Lição de CSS aprendida construindo isso**: regras genéricas antigas tipo `.contact-form button`
 e `.contact-form label` (classe + elemento = mais específicas que uma classe só) atropelavam meus
@@ -217,13 +223,26 @@ pra exercer esses direitos. CSS novo: `.legal-content` em `style.css`.
     por aqui) e confirmado: clique no botão do WhatsApp agora dispara certinho tanto a tag "Lead -
     WhatsApp" (conversão Google Ads) quanto "GA4 - Lead WhatsApp" (evento `generate_lead` no GA4,
     Measurement ID `G-LHHVNQRLN3`). **Rastreamento de ponta a ponta confirmado funcionando.**
-  - Ainda não testado especificamente: o clique no WhatsApp que sai do **formulário-quiz** da home
-    (o que monta a mensagem dinamicamente via JS e faz `window.location`/abre a URL), diferente do
-    botão flutuante fixo e dos CTAs mobile (que são `<a href>` normais). Vale testar esse caminho
-    separado se quiser ter certeza que o quiz também conta como lead — o acionador "Lead -
-    Whatsapp" (Just Links, regex `wa\.link|api\.whatsapp\.com|wa\.me`) só captura cliques reais em
-    tags `<a>`, então se o quiz usa navegação via JS sem um `<a href>` real sendo clicado, pode não
-    ser pego. Verificar antes de assumir que está 100% coberto.
+  - **Confirmado o suspeita:** o clique no WhatsApp que sai do **formulário-quiz** da home (`js/
+    script.js`, `window.open(url, '_blank')` montado via JS) realmente NÃO era capturado pelo
+    acionador "Lead - Whatsapp" (Just Links só pega clique real em `<a>`, e ali não tem link,
+    é só JS abrindo a URL). Um segundo Claude (rodando num outro computador com Chrome, via
+    Claude in Chrome) testou ao vivo e confirmou: nenhum `gtm.linkClick` disparava ao enviar o
+    formulário.
+  - **RESOLVIDO (28/07/2026, mesma sessão):** adicionado um `dataLayer.push({event:
+    'whatsapp_lead_form', form_id: 'contact-form'})` em `js/script.js`, logo antes do `window.open`
+    (linhas ~125-133). Cache-bust do `script.js` subiu de `?v=5` para `?v=6` nas 12 páginas. Testado
+    localmente com Node+jsdom simulando o preenchimento completo do quiz — confirmado que o evento
+    aparece no `dataLayer` exatamente antes de abrir a URL do WhatsApp. Commit `2cd813b` no GitHub,
+    republicado na HostGator (rezipado, `script.js` confirmado com timestamp de hoje 20:22 dentro
+    de `public_html/js/`).
+  - **Pendente do lado do Felipe (ele mesmo vai fazer, não mexer):** criar no GTM uma trigger tipo
+    "Custom Event" escutando o evento `whatsapp_lead_form`, e apontar as tags GA4 (`generate_lead`
+    ou um evento próprio) e Google Ads pra ela também — assim o lead do formulário-quiz passa a
+    contar igual ao do botão flutuante.
+  - **Pendência de limpeza no cPanel:** sobrou um arquivo `.gitignore` solto na raiz do
+    `public_html` (vem junto do zip do GitHub) — apagar na próxima vez que entrar lá, não deveria
+    ficar público.
   - Onde ver os dados: GA4 → Reports → Realtime overview (instantâneo) ou Reports → Engagement →
     Events (relatório padrão, delay de horas pra atualizar) — procurar pelo evento `generate_lead`.
     Pra virar "conversão" oficial dentro do próprio GA4: Admin → Events → `generate_lead` → "Mark
