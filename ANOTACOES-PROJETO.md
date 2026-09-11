@@ -38,12 +38,33 @@ ficou genérico (sem citar marca de barra de vídeo — Cleverson não definiu m
   novos: `corporativo/index.html`, `img/corporativo/sala-reuniao-videoconferencia.jpg`; arquivos
   alterados: `index.html`, `sitemap.xml` e as 11 páginas de marca/sobre/privacidade, por causa do
   link novo no menu).
-- **11/09/2026, tarde**: card "Painel de Controle Único" ganhou foto — `img/corporativo/painel-controle-unico.jpg`,
-  recortada de um material oficial de produto RTI (Intelligent Surfaces IST-10) que o Cleverson
-  salvou do site de um distribuidor (AVPro Global) e mandou aqui. Ainda sem imagem real pros 3
-  cards restantes (iluminação, climatização, persianas) — só texto por enquanto, mesmo padrão
-  usado nas marcas que começaram sem foto. **Pendente de push** (arquivo local ainda não subiu
-  pro GitHub).
+- **11/09/2026, tarde**: card "Painel de Controle Único" virou um mini carrossel (mesmo padrão do
+  ControlArt/Sobre — `.photo.contain.product-carousel`, fundo escuro, setas prev/next) com 3 fotos
+  oficiais de produto RTI (Intelligent Surfaces): `painel-controle-unico.jpg` (instalação real na
+  parede), `painel-controle-mesa.jpg` (suporte de mesa) e `painel-controle-tamanhos.jpg` (as duas
+  opções de tamanho lado a lado). Todas salvas pelo Cleverson do site de um distribuidor (AVPro
+  Global) e mandadas aqui. Ainda sem imagem real pros 3 cards restantes (iluminação, climatização,
+  persianas) — só texto por enquanto, mesmo padrão usado nas marcas que começaram sem foto.
+- **11/09/2026 — sincronização com outra instância (Claude Code/Projeto) que mexeu na mesma pasta:**
+  outra sessão minha (rodando em outro ambiente, não Cowork) trabalhou nessa mesma pasta local em
+  paralelo, inicializou um `.git` direto dentro dela (diferente do método que uso aqui, clone
+  temporário em `/tmp`), e reconciliou meses de trabalho não commitado (favicons reais — antes só
+  a tag HTML existia, sem os arquivos —, página de privacidade, fotos de produto). Fez merge com o
+  que eu tinha acabado de publicar (página Corporativo), resolvendo conflito mantendo minha versão
+  mais recente. Resultado final: **tudo confirmado no GitHub, commit `3be4308`**, incluindo a
+  página Corporativo completa (3 fotos), favicons de verdade, e o link "Corporativo" no menu.
+  Verifiquei clonando fresh do GitHub — bate 100% com os arquivos locais.
+  **Decisão do Cleverson: NÃO publicar isso na HostGator ainda** — favicons + menu + página
+  Corporativo vão pro ar juntos, só quando a página Corporativo estiver pronta de verdade
+  (faltam fotos dos cards de iluminação/climatização/persianas).
+  **Bug conhecido**: o `.git` que essa outra instância criou direto na pasta do iCloud tem
+  referências (`refs/remotes/origin/main`, `origin/HEAD`, uma branch de backup) que dão erro
+  "Resource deadlock avoided" ao ler — é a mesma instabilidade de sempre do iCloud com "Otimizar
+  Armazenamento". Não afeta os arquivos em si (conferido, estão OK) nem o conteúdo já publicado no
+  GitHub, só atrapalha comandos `git fetch/branch -a` rodando direto nessa pasta. Se isso incomodar
+  de novo: Finder → botão direito na pasta → "Baixar Agora", esperar terminar, tentar de novo. Meu
+  método (clone temporário em `/tmp/repo-sync`, fora do iCloud) sempre contorna esse problema e
+  continua sendo o caminho confiável pra fazer push.
 
 ## Estrutura do projeto
 
