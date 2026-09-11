@@ -1,22 +1,118 @@
-// Formulário de contato: monta a mensagem e abre o WhatsApp
+// Questionário dinâmico de contato: uma pergunta por vez, monta a mensagem e abre o WhatsApp
 (function () {
   var form = document.getElementById('contact-form');
   if (!form) return;
   var WHATSAPP_NUMBER = '5541991510243';
 
+  var allSteps = {};
+  form.querySelectorAll('.quiz-step').forEach(function (el) {
+    allSteps[el.getAttribute('data-step')] = el;
+  });
+  if (!Object.keys(allSteps).length) return; // formulário antigo (sem quiz) — não faz nada
+
+  var progressBar = document.getElementById('quiz-progress-bar');
+  var stepCountEl = document.getElementById('quiz-step-count');
+  var answers = {};
+  // Caminho padrão (quem responde "Não" pra 1ª pergunta segue direto por aqui,
+  // sem "fase da obra" nem "tipo de projeto", direto pra "já tem automação instalada").
+  var path = ['obra', 'existente', 'nome'];
+  var pos = 0;
+
+  function render() {
+    Object.keys(allSteps).forEach(function (key) {
+      allSteps[key].classList.remove('active');
+    });
+    var key = path[pos];
+    allSteps[key].classList.add('active');
+    if (progressBar) progressBar.style.width = ((pos + 1) / path.length * 100) + '%';
+    if (stepCountEl) stepCountEl.textContent = 'Passo ' + (pos + 1) + ' de ' + path.length;
+  }
+
+  function goTo(newPos) {
+    if (newPos < 0 || newPos >= path.length) return;
+    pos = newPos;
+    render();
+  }
+
+  render();
+
+  // Perguntas de múltipla escolha: seleciona, guarda a resposta e avança sozinho
+  form.querySelectorAll('.quiz-option').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var field = btn.getAttribute('data-field');
+      var value = btn.getAttribute('data-value');
+      answers[field] = value;
+
+      var siblings = btn.parentNode.querySelectorAll('.quiz-option');
+      siblings.forEach(function (s) { s.classList.remove('selected'); });
+      btn.classList.add('selected');
+
+      // Pergunta 1 (construindo/reformando) decide todo o resto do caminho:
+      // Sim -> fase da obra -> tipo de projeto -> nome (pula "já tem automação")
+      // Não -> já tem automação -> nome (pula fase da obra e tipo de projeto)
+      if (field === 'obra') {
+        if (value === 'Sim') {
+          path = ['obra', 'fase', 'tipo', 'nome'];
+          answers.existente = '';
+        } else {
+          path = ['obra', 'existente', 'nome'];
+          answers.fase = '';
+          answers.tipo = '';
+        }
+      }
+
+      setTimeout(function () { goTo(pos + 1); }, 250);
+    });
+  });
+
+  // Botões "Voltar"
+  form.querySelectorAll('.quiz-back').forEach(function (btn) {
+    btn.addEventListener('click', function () { goTo(pos - 1); });
+  });
+
+  // Botões "Continuar" (passos com campo de texto): valida antes de avançar
+  form.querySelectorAll('.quiz-next').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var step = allSteps[path[pos]];
+      var required = step.querySelector('[required]');
+      if (required && !required.value.trim()) {
+        required.focus();
+        required.reportValidity();
+        return;
+      }
+      goTo(pos + 1);
+    });
+  });
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var nome = form.nome.value.trim();
-    var telefone = form.telefone.value.trim();
-    var tipo = form.tipo.value;
-    var mensagem = form.mensagem.value.trim();
+    var nomeInput = document.getElementById('quiz-nome');
+    if (!nomeInput.value.trim()) {
+      nomeInput.focus();
+      nomeInput.reportValidity();
+      return;
+    }
+
+    var nome = nomeInput.value.trim();
+    var obra = answers.obra || '';
+    var fase = answers.fase || '';
+    var tipo = answers.tipo || '';
+    var existente = answers.existente || '';
 
     var texto = 'Olá! Meu nome é ' + nome + '.' +
-      '\nTelefone: ' + telefone +
-      '\nTipo de projeto: ' + tipo +
-      (mensagem ? '\nDetalhes: ' + mensagem : '');
+      '\nConstruindo/reformando: ' + obra +
+      (fase ? '\nFase da obra: ' + fase : '') +
+      (tipo ? '\nTipo de projeto: ' + tipo : '') +
+      (existente ? '\nJá tem automação instalada: ' + existente : '');
 
     var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(texto);
+
+    window.dataLayer = window.dataLayer || [];
+    dataLayer.push({
+      event: 'whatsapp_lead_form',
+      form_id: 'contact-form'
+    });
+
     window.open(url, '_blank');
   });
 })();
@@ -110,6 +206,30 @@ document.querySelectorAll('.scene-btn').forEach(function (btn) {
     }
   }
 })();
+
+// Mini carrossel de fotos dentro de cards de produto (setas esquerda/direita)
+document.querySelectorAll('.product-carousel').forEach(function (wrap) {
+  var images = [];
+  try {
+    images = JSON.parse(wrap.getAttribute('data-images') || '[]');
+  } catch (e) {
+    images = [];
+  }
+  if (images.length < 2) return;
+
+  var img = wrap.querySelector('.service-card-img');
+  var prevBtn = wrap.querySelector('.carousel-arrow-prev');
+  var nextBtn = wrap.querySelector('.carousel-arrow-next');
+  var idx = 0;
+
+  function show(i) {
+    idx = (i + images.length) % images.length;
+    img.src = images[idx];
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function () { show(idx - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { show(idx + 1); });
+});
 
 // Carrossel de projetos: navegação por setas
 (function () {
